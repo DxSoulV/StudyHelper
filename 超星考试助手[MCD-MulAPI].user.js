@@ -9,6 +9,8 @@
 // @connect      api.902000.xyz
 // @connect      cx.icodef.com
 // @run-at       document-end
+// @updateURL    http://902000.xyz/scripts/chaoxing_exam.php
+// @installURL   http://902000.xyz/scripts/chaoxing_exam.php
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
