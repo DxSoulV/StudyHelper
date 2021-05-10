@@ -7,6 +7,8 @@
 // @match        *://*.zhihuishu.com/*
 // @connect      api.902000.xyz
 // @connect      report.902000.xyz
+// @updateURL    https://902000.xyz/scripts/zhihuishu.php
+// @installURL   https://902000.xyz/scripts/zhihuishu.php
 // @run-at       document-end
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
