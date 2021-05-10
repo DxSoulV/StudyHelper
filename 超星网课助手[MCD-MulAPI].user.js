@@ -10,6 +10,8 @@
 // @connect      report.902000.xyz
 // @connect      cx.icodef.com
 // @run-at       document-end
+// @updateURL    http://902000.xyz/scripts/chaoxing.php
+// @installURL   http://902000.xyz/scripts/chaoxing.php
 // @grant        unsafeWindow
 // @grant        GM_xmlhttpRequest
 // @grant        GM_setClipboard
