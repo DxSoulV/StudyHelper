@@ -6,6 +6,8 @@
 // @author       wyn665817 & MCD
 // @match        *://*.chaoxing.com/*
 // @match        *://*.edu.cn/*
+// @match        *://*.nbdlib.cn/*
+// @match        *://*.hnsyu.net/*
 // @connect      api.902000.xyz
 // @connect      report.902000.xyz
 // @connect      cx.icodef.com
