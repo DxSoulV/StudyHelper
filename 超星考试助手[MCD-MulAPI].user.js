@@ -6,6 +6,8 @@
 // @author       wyn665817 & MCDream
 // @match        *://*.chaoxing.com/exam/test/reVersionTestStartNew*
 // @match        *://*.edu.cn/exam/test/reVersionTestStartNew*
+// @match        *://*.nbdlib.cn/exam/test/reVersionTestStartNew*
+// @match        *://*.hnsyu.net/exam/test/reVersionTestStartNew*
 // @connect      api.902000.xyz
 // @connect      cx.icodef.com
 // @run-at       document-end
