@@ -689,7 +689,7 @@ function setMCInfo(api, auto, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toGMTString();
-    document.cookie = "MC_user_setting=" + JSON.stringify({api, auto}) + "; " + expires;
+    document.cookie = "MC_user_setting=" + JSON.stringify({api, auto}) + "; " + expires +";path=/;";
 }
 
 function getMCInfo(name) {
@@ -734,7 +734,7 @@ function getPublicNotice() {
         onload: function (xhr) {
             setting.notice = JSON.parse(xhr.responseText).notice;
             //save 2 hour
-            document.cookie = "MC_notice=" + setting.notice + "; expires=7200000";
+            document.cookie = "MC_notice=" + setting.notice + "; expires=7200000"+";path=/;";
         }
     })
     return "";
