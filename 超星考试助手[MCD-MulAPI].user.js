@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         超星考试助手[MCD-MulAPI]
 // @namespace    MCDream
-// @version      4.0.5.1
+// @version      4.0.5.2
 // @description  接口自动提交功能可视化变更，自动挂机看尔雅MOOC，支持视频、音频、文档、图书自动完成，章节测验自动答题提交，支持自动切换任务点、挂机阅读时长、自动登录等，解除各类功能限制，开放自定义参数。集成各个作者大大的接口，便捷切换
 // @author       wyn665817 & MCDream
 // @match        *://*.chaoxing.com/exam/test/reVersionTestStartNew*
@@ -10,6 +10,7 @@
 // @match        *://*.hnsyu.net/exam/test/reVersionTestStartNew*
 // @connect      api.902000.xyz
 // @connect      cx.icodef.com
+// @connect      api.gochati.cn
 // @run-at       document-end
 // @updateURL    http://902000.xyz/scripts/chaoxing_exam.php
 // @installURL   http://902000.xyz/scripts/chaoxing_exam.php
@@ -26,7 +27,7 @@
 var queryapi = [
     //接口可以定义，参数可以自行理解
     //{"url" : "http://106.52.197.16:8080/chaoxing_war/topicServlet","getIssueParam":"action=query&q=","keyParam":"data","method":"get"},
-    //{"url" : "http://imnu.52king.cn/api/wk/index.php","getIssueParam":"c=","keyParam":"answer","method":"get"},
+    {"url": "http://api.gochati.cn/jsapi.php","getIssueParam":"token=cxmooc&q=","keyParam":"da","method":"get"},
     {"url": "http://api.902000.xyz:88/wkapi.php", "postIssueParam": "q", "keyParam": "answer", "method": "post"},
     {"url": "http://cx.icodef.com/wyn-nb?v=2", "postIssueParam": "question", "keyParam": "data", "method": "post"}
 
@@ -34,7 +35,7 @@ var queryapi = [
 ];
 
 var setting = {
-        api: 1 //默认接口序号（0开始）
+        api: 0 //默认接口序号（0开始）
         // 8E3 == 8000，科学记数法，表示毫秒数
         , time: 8E3 // 默认响应速度为8秒，不建议小于5秒
         // 1代表开启，0代表关闭
@@ -103,7 +104,9 @@ setting.div = $(
     '</div>'
 ).appendTo('body').on('click', 'button, td', function () {
     var num = setting.$btn.index(this);
-    var user_setting = JSON.parse(getMCInfo("MCE_user_setting"));
+    checkMCInfo();
+    getPublicNotice();
+    let user_setting = JSON.parse(getMCInfo("MCE_user_setting"));
     if (num == -1) {
         GM_setClipboard($(this).text());
     } else if (num === 0) {
@@ -164,6 +167,10 @@ $.each(UE.instants, function () {
 setting.loop = setInterval(findTiMu, setting.time);
 
 function findTiMu() {
+    let user_setting = JSON.parse(getMCInfo("MCE_user_setting"));
+    setting.api = user_setting.api;
+    setting.notice = getPublicNotice();
+    // alert(setting.api)
     GM_xmlhttpRequest({
         method: queryapi[setting.api].method,
         url: queryapi[setting.api].url + "?" + queryapi[setting.api].getIssueParam + encodeURIComponent(setting.TiMu[0]),
@@ -195,7 +202,7 @@ function findTiMu() {
                 } else {
                     setting.$div.html(obj.data || '服务器繁忙，正在重试...');
                 }
-                setting.div.children('span').html(obj.msg + setting.notice || '');
+                setting.div.children('span').html(setting.notice || '');
             } else if (xhr.status == 403) {
                 var html = xhr.responseText.indexOf('{') ? '请求过于频繁，建议稍后再试' : $.parseJSON(xhr.responseText).data;
                 setting.$div.data('html', html).siblings('button:eq(0)').click();
@@ -280,11 +287,11 @@ function setMCInfo(api, auto, exdays) {
     var d = new Date();
     d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
     var expires = "expires=" + d.toGMTString();
-    document.cookie = "MCE_user_setting=" + JSON.stringify({api, auto}) + "; " + expires;
+    document.cookie = "MCE_user_setting=" + JSON.stringify({api, auto}) + "; " + expires +";path=/;";
 }
 
 function getMCInfo(name) {
-    var name = name + "=";
+    name = name + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
         var c = ca[i].trim();
@@ -308,25 +315,23 @@ function checkMCInfo() {
 }
 
 function getPublicNotice() {
-    var notice = "MC_notice=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i].trim();
-        if (c.indexOf(notice) == 0) {
-            setting.notice = c.substring(notice.length, c.length);
-        }
+    var notice = getMCInfo("MC_notice");
+    if(notice.length>0){
+        return notice;
+    }else
+    {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: "http://api.902000.xyz:88/notice.php",
+            headers: {
+                'Content-type': 'application/x-www-form-urlencoded'
+            },
+            onload: function (xhr) {
+                setting.notice = JSON.parse(xhr.responseText).notice;
+                //save 2 hour
+                document.cookie = "MC_notice=" + setting.notice + "; expires=7200000"+";path=/;";
+            }
+        })
     }
-    GM_xmlhttpRequest({
-        method: "GET",
-        url: "http://api.902000.xyz:88/notice.php",
-        headers: {
-            'Content-type': 'application/x-www-form-urlencoded'
-        },
-        onload: function (xhr) {
-            setting.notice = JSON.parse(xhr.responseText).notice;
-            //save 2 hour
-            document.cookie = "MC_notice=" + setting.notice + "; expires=7200000";
-        }
-    })
     return "";
 }
