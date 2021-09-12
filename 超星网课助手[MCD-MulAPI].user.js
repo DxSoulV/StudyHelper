@@ -11,6 +11,7 @@
 // @connect      api.902000.xyz
 // @connect      report.902000.xyz
 // @connect      cx.icodef.com
+// @connect      api.gochati.cn
 // @run-at       document-end
 // @updateURL    http://902000.xyz/scripts/chaoxing.php
 // @installURL   http://902000.xyz/scripts/chaoxing.php
@@ -29,8 +30,11 @@ var queryapi = [
 
     //{"url" : "http://106.52.197.16:8080/chaoxing_war/topicServlet","getIssueParam":"action=query&q=","keyParam":"data","method":"get"},
     //{"url" : "http://imnu.52king.cn/api/wk/index.php","getIssueParam":"c=","keyParam":"answer","method":"get"},
+    {"url": "http://api.gochati.cn/jsapi.php","getIssueParam":"token=cxmooc&q=","keyParam":"da","method":"GET"},
     {"url": "http://api.902000.xyz:88/wkapi.php", "postIssueParam": "q", "keyParam": "answer", "method": "POST"},
-    {"url": "http://cx.icodef.com/wyn-nb?v=2", "postIssueParam": "question", "keyParam": "data", "method": "POST"}
+    {"url": "http://cx.icodef.com/wyn-nb?v=2", "postIssueParam": "question", "keyParam": "data", "method": "POST"},
+
+
 ];
 
 var setting = {
@@ -161,7 +165,7 @@ if (url == '/mycourse/studentstudy') {
     if(document.querySelector('body > div.box > div.Header > div > a') !== null){
         backToOld();
     }
-}else if (url == '/mycourse/studentcourse') {
+} else if (url == '/mycourse/studentcourse') {
     var gv = location.search.match(/d=\d+&/g);
     setting.total && $('<a>', {
         href: '/moocAnalysis/chapterStatisticByUser?classI' + gv[1] + 'courseI' + gv[0] + 'userId=' + _self.getCookie('_uid') + '&ut=s',
@@ -386,6 +390,9 @@ function beforeFind() {
 }
 
 function findAnswer() {
+    let user_setting = JSON.parse(getMCInfo("MC_user_setting"));
+    setting.api = user_setting.api;
+    setting.notice = getPublicNotice();
     if (setting.num >= $('.TiMu').length) {
         var arr = setting.lose ? ['共有 <font color="red">' + setting.lose + '</font> 道题目待完善（已深色标注）', saveThis] : ['答题已完成', submitThis];
         setting.div.children('div:eq(0)').data('html', arr[0]).siblings('button:eq(0)').hide().click();
@@ -431,8 +438,8 @@ function findAnswer() {
                 } else {
                     setting.div.children('div:eq(0)').html(obj.data || setting.over + '服务器繁忙，正在重试...（或者切换接口）');
                 }
-                if (obj.msg) obj.msg += setting.notice + '<br/>一起完善题库吧！请在提交后重新打开题目页面,等待题目加载完成即可！';
-                else obj.msg = setting.notice + '<br/>请在提交后重新打开做题页面，一起充实题库，感谢支持！';
+                obj.msg = (obj.extra || setting.notice ||'')
+                obj.msg += '<br/>一起完善题库吧！请在提交后重新打开题目页面,等待题目加载完成即可！';
                 setting.div.children('span').html(obj.msg);
             } else if (xhr.status == 403 || xhr.status == 444) {
                 var html = xhr.responseText.indexOf('{') ? '请求过于频繁，建议稍后再试或尝试切换接口' : $.parseJSON(xhr.responseText).data;
@@ -693,7 +700,7 @@ function setMCInfo(api, auto, exdays) {
 }
 
 function getMCInfo(name) {
-    var name = name + "=";
+    name = name + "=";
     var ca = document.cookie.split(';');
     for (var i = 0; i < ca.length; i++) {
         var c = ca[i].trim();
@@ -717,25 +724,23 @@ function checkMCInfo() {
 }
 
 function getPublicNotice() {
-    var notice = "MC_notice=";
-    var ca = document.cookie.split(';');
-    for (var i = 0; i < ca.length; i++) {
-        var c = ca[i].trim();
-        if (c.indexOf(notice) == 0) {
-            setting.notice = c.substring(notice.length, c.length);
-        }
+    var notice = getMCInfo("MC_notice");
+    if(notice.length>0){
+        return notice;
+    }else
+    {
+        GM_xmlhttpRequest({
+            method: "GET",
+            url: "http://api.902000.xyz:88/notice.php",
+            headers: {
+                'Content-type': 'application/x-www-form-urlencoded'
+            },
+            onload: function (xhr) {
+                setting.notice = JSON.parse(xhr.responseText).notice;
+                //save 2 hour
+                document.cookie = "MC_notice=" + setting.notice + "; expires=7200000"+";path=/;";
+            }
+        })
     }
-    GM_xmlhttpRequest({
-        method: "GET",
-        url: "http://api.902000.xyz:88/notice.php",
-        headers: {
-            'Content-type': 'application/x-www-form-urlencoded'
-        },
-        onload: function (xhr) {
-            setting.notice = JSON.parse(xhr.responseText).notice;
-            //save 2 hour
-            document.cookie = "MC_notice=" + setting.notice + "; expires=7200000"+";path=/;";
-        }
-    })
     return "";
 }
