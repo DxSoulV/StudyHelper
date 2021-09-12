@@ -23,6 +23,7 @@
 // @original-license MIT
 // ==/UserScript==
 
+
 // 设置修改后，需要刷新或重新打开网课页面才会生效
 var queryapi = [
     //接口可以定义，参数可以自行理解
