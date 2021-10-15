@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         超星考试助手[MCD-MulAPI]
 // @namespace    MCDream
-// @version      4.0.5.2
+// @version      4.0.5.3
 // @description  接口自动提交功能可视化变更，自动挂机看尔雅MOOC，支持视频、音频、文档、图书自动完成，章节测验自动答题提交，支持自动切换任务点、挂机阅读时长、自动登录等，解除各类功能限制，开放自定义参数。集成各个作者大大的接口，便捷切换
 // @author       wyn665817 & MCDream
 // @match        *://*.chaoxing.com/exam/test/reVersionTestStartNew*
