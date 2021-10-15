@@ -316,7 +316,7 @@ function checkMCInfo() {
 }
 
 function getPublicNotice() {
-    var notice = getMCInfo("MC_notice");
+    var notice = getMCInfo("MC_GG");
     if(notice.length>0){
         return notice;
     }else
@@ -330,7 +330,7 @@ function getPublicNotice() {
             onload: function (xhr) {
                 setting.notice = JSON.parse(xhr.responseText).notice;
                 //save 2 hour
-                document.cookie = "MC_notice=" + setting.notice + "; expires=7200000"+";path=/;";
+                document.cookie = "MC_GG=" + setting.notice + "; expires=7200000"+";path=/;";
             }
         })
     }
