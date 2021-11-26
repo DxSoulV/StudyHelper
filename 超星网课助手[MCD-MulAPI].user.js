@@ -233,15 +233,19 @@ function checkPlayer(tip) {
 
 function hookVideo() {
     _self.alert = console.log;
-    var config = arguments[1],
-        line = Ext.Array.filter(Ext.Array.map(config.playlines, function (value, index) {
+    console.log(arguments);
+    var config = arguments[1];
+    if(config == undefined)
+        return vjs.apply(this,arguments)
+    var line = Ext.Array.filter(Ext.Array.map(config.playlines, function (value, index) {
             return value.label == setting.line && index;
         }), function (value) {
             return Ext.isNumber(value);
-        })[0] || 0,
-        http = Ext.Array.filter(config.sources, function (value) {
+        })[0] || 0
+    var http = Ext.Array.filter(config.sources, function (value) {
             return value.label == setting.http;
         })[0];
+    config.playbackRates = [0.5, 1, 1.5, 2, Number(setting.rate)];
     config.playlines.unshift(config.playlines[line]);
     config.playlines.splice(line + 1, 1);
     config.plugins.videoJsResolutionSwitcher.default = http ? http.res : 360;
@@ -252,7 +256,8 @@ function hookVideo() {
     // config.preload = setting.tip ? 'auto' : 'none';
     var player = vjs.apply(this, arguments),
         a = '<a href="https://d0.ananas.chaoxing.com/download/' + _self.config('objectid') + '" target="_blank">',
-        img = '<img src="https://d0.ananas.chaoxing.com/download/e363b256c0e9bc5bd8266bf99dd6d6bb" style="margin: 6px 0 0 6px;">';
+        img = '<svg t="1637929364672" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2306" width="17" height="17"><path d="M505.7 661c3.2 4.1 9.4 4.1 12.6 0l112-141.7c4.1-5.2 0.4-12.9-6.3-12.9h-74.1V168c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v338.3H400c-6.7 0-10.4 7.7-6.3 12.9l112 141.8z" p-id="2307" fill="#e6e6e6"></path><path d="M878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z" p-id="2308" fill="#e6e6e6"></path></svg>';
+    player.playbackRate = function (t) { if (void 0 === t) return; this.tech_ && this.tech_.featuresPlaybackRate ? this.cache_.lastPlaybackRate || this.techGet_("playbackRate") : setting.rate; this.techCall_("setPlaybackRate", t) };
     player.volume(Math.round(setting.vol) / 100 || 0);
     Ext.get(player.controlBar.addChild('Button').el_).setHTML(a + img + '</a>').dom.title = '下载视频';
     player.on('loadstart', function () {
@@ -277,7 +282,7 @@ function hookAudio() {
     if (!setting.queue) delete config.plugins.studyControl;
     var player = vjs.apply(this, arguments),
         a = '<a href="https://d0.ananas.chaoxing.com/download/' + _self.config('objectid') + '" target="_blank">',
-        img = '<img src="https://d0.ananas.chaoxing.com/download/e363b256c0e9bc5bd8266bf99dd6d6bb" style="margin: 6px 0 0 6px;">';
+        img = '<svg t="1637929364672" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2306" width="17" height="17"><path d="M505.7 661c3.2 4.1 9.4 4.1 12.6 0l112-141.7c4.1-5.2 0.4-12.9-6.3-12.9h-74.1V168c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v338.3H400c-6.7 0-10.4 7.7-6.3 12.9l112 141.8z" p-id="2307" fill="#e6e6e6"></path><path d="M878 626h-60c-4.4 0-8 3.6-8 8v154H214V634c0-4.4-3.6-8-8-8h-60c-4.4 0-8 3.6-8 8v198c0 17.7 14.3 32 32 32h684c17.7 0 32-14.3 32-32V634c0-4.4-3.6-8-8-8z" p-id="2308" fill="#e6e6e6"></path></svg>';
     player.volume(Math.round(setting.vol) / 100 || 0);
     player.playbackRate(setting.rate > 16 || setting.rate < 0.0625 ? 1 : setting.rate);
     Ext.get(player.controlBar.addChild('Button').el_).setHTML(a + img + '</a>').dom.title = '下载音频';
